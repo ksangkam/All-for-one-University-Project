@@ -1,0 +1,52 @@
+create extension if not exists btree_gist;
+create type public.user_role as enum ('renter','owner');
+create type public.booking_status as enum ('pending','confirmed','returned','rejected','cancelled');
+create table public.profiles(id uuid primary key references auth.users(id) on delete cascade, full_name text not null default '', role public.user_role not null default 'renter', phone text, created_at timestamptz not null default now());
+create table public.shops(id uuid primary key default gen_random_uuid(), owner_id uuid not null references public.profiles(id), shop_name text not null, description text not null default '', area text not null, contact_info text not null default '', created_at timestamptz not null default now());
+create table public.products(id uuid primary key default gen_random_uuid(), shop_id uuid not null references public.shops(id) on delete cascade, name text not null, description text not null default '', category text not null check(category in ('camping','thai_dress','camera','diving')), area text not null, daily_price integer not null check(daily_price >= 0), deposit integer not null default 0 check(deposit >= 0), image_url text, condition text not null default '', is_active boolean not null default true, created_at timestamptz not null default now());
+create table public.bookings(id uuid primary key default gen_random_uuid(), product_id uuid not null references public.products(id), renter_id uuid not null references public.profiles(id), shop_id uuid not null references public.shops(id), start_date date not null, end_date date not null, rental_days integer not null check(rental_days > 0), daily_price_snapshot integer not null, rental_total integer not null, deposit_amount integer not null, protection_selected boolean not null default false, protection_fee integer not null default 0, platform_fee integer not null, community_fund integer not null, total_due integer not null, owner_net integer not null, status public.booking_status not null default 'pending', created_at timestamptz not null default now(), updated_at timestamptz not null default now(), constraint booking_dates_valid check(end_date > start_date), constraint booking_amounts_nonnegative check(daily_price_snapshot >= 0 and rental_total >= 0 and deposit_amount >= 0 and protection_fee >= 0 and platform_fee >= 0 and community_fund >= 0 and total_due >= 0 and owner_net >= 0));
+create index bookings_product_dates on public.bookings(product_id,start_date,end_date) where status in ('pending','confirmed');
+create index bookings_renter on public.bookings(renter_id,created_at desc);
+create table public.product_unavailability(id uuid primary key default gen_random_uuid(), product_id uuid not null references public.products(id) on delete cascade, start_date date not null, end_date date not null, reason text not null default '', constraint unavailable_dates_valid check(end_date > start_date));
+create table public.community_funds(id uuid primary key default gen_random_uuid(), booking_id uuid not null unique references public.bookings(id), area text not null, amount integer not null check(amount >= 0), status text not null default 'accrued' check(status in ('accrued','paid','void')), created_at timestamptz not null default now());
+alter table public.bookings add constraint no_active_booking_overlap exclude using gist (product_id with =, daterange(start_date,end_date,'[)') with &&) where (status in ('pending','confirmed'));
+create or replace function public.create_booking(p_product_id uuid,p_start_date date,p_end_date date,p_protection boolean default false) returns public.bookings language plpgsql security definer set search_path=public as $$
+declare p public.products; days integer; rent integer; prot integer; fee integer; fund integer; total integer; net integer; result public.bookings;
+begin
+ if auth.uid() is null then raise exception 'Authentication required'; end if;
+ if p_end_date <= p_start_date then raise exception 'Invalid rental dates'; end if;
+ select * into p from public.products where id=p_product_id and is_active for update;
+ if not found then raise exception 'Product unavailable'; end if;
+ if exists(select 1 from public.product_unavailability u where u.product_id=p.id and daterange(u.start_date,u.end_date,'[)') && daterange(p_start_date,p_end_date,'[)')) then raise exception 'Dates unavailable'; end if;
+ days := p_end_date-p_start_date; rent := p.daily_price*days; prot := case when p_protection then round(rent*0.05)::integer else 0 end; fee := round(rent*0.12)::integer; fund := round(fee*0.02)::integer; total := rent+prot+p.deposit; net := rent-fee;
+ insert into public.bookings(product_id,renter_id,shop_id,start_date,end_date,rental_days,daily_price_snapshot,rental_total,deposit_amount,protection_selected,protection_fee,platform_fee,community_fund,total_due,owner_net) values(p.id,auth.uid(),p.shop_id,p_start_date,p_end_date,days,p.daily_price,rent,p.deposit,p_protection,prot,fee,fund,total,net) returning * into result;
+ insert into public.community_funds(booking_id,area,amount) values(result.id,p.area,fund); return result;
+end $$;
+revoke all on function public.create_booking(uuid,date,date,boolean) from public, anon;
+grant execute on function public.create_booking(uuid,date,date,boolean) to authenticated;
+create or replace function public.set_booking_status(p_booking_id uuid,p_status public.booking_status) returns public.bookings language plpgsql security definer set search_path=public as $$
+declare b public.bookings; is_owner boolean;
+begin
+ select * into b from public.bookings where id=p_booking_id for update; if not found then raise exception 'Booking not found'; end if;
+ select exists(select 1 from public.shops s where s.id=b.shop_id and s.owner_id=auth.uid()) into is_owner; if not is_owner then raise exception 'Shop owner permission required'; end if;
+ if not ((b.status='pending' and p_status in ('confirmed','rejected')) or (b.status='confirmed' and p_status='returned')) then raise exception 'Invalid status transition'; end if;
+ update public.bookings set status=p_status,updated_at=now() where id=b.id returning * into b; return b;
+end $$;
+revoke all on function public.set_booking_status(uuid,public.booking_status) from public,anon;
+grant execute on function public.set_booking_status(uuid,public.booking_status) to authenticated;
+alter table public.profiles enable row level security; alter table public.shops enable row level security; alter table public.products enable row level security; alter table public.bookings enable row level security; alter table public.product_unavailability enable row level security; alter table public.community_funds enable row level security;
+create policy "profiles read own" on public.profiles for select to authenticated using(id=auth.uid());
+create policy "profiles update own" on public.profiles for update to authenticated using(id=auth.uid()) with check(id=auth.uid());
+create policy "shops public read" on public.shops for select using(true);
+create policy "shops owner manage" on public.shops for all to authenticated using(owner_id=auth.uid()) with check(owner_id=auth.uid() and exists(select 1 from public.profiles p where p.id=auth.uid() and p.role='owner'));
+create policy "products public read" on public.products for select using(is_active or exists(select 1 from public.shops s where s.id=shop_id and s.owner_id=auth.uid()));
+create policy "products owner manage" on public.products for all to authenticated using(exists(select 1 from public.shops s where s.id=shop_id and s.owner_id=auth.uid())) with check(exists(select 1 from public.shops s join public.profiles p on p.id=s.owner_id where s.id=shop_id and s.owner_id=auth.uid() and p.role='owner'));
+create policy "booking parties read" on public.bookings for select to authenticated using(renter_id=auth.uid() or exists(select 1 from public.shops s where s.id=shop_id and s.owner_id=auth.uid()));
+create policy "renter cancel pending" on public.bookings for update to authenticated using(renter_id=auth.uid() and status='pending') with check(renter_id=auth.uid() and status='cancelled');
+create policy "unavailability public read" on public.product_unavailability for select using(true);
+create policy "owner manage unavailability" on public.product_unavailability for all to authenticated using(exists(select 1 from public.products p join public.shops s on s.id=p.shop_id where p.id=product_id and s.owner_id=auth.uid())) with check(exists(select 1 from public.products p join public.shops s on s.id=p.shop_id join public.profiles pr on pr.id=s.owner_id where p.id=product_id and s.owner_id=auth.uid() and pr.role='owner'));
+create policy "fund booking parties read" on public.community_funds for select to authenticated using(exists(select 1 from public.bookings b left join public.shops s on s.id=b.shop_id where b.id=booking_id and (b.renter_id=auth.uid() or s.owner_id=auth.uid())));
+create or replace function public.prevent_profile_role_change() returns trigger language plpgsql as $$ begin if new.role is distinct from old.role and current_user <> 'service_role' then raise exception 'Role changes require trusted provisioning'; end if; return new; end $$;
+create trigger protect_profile_role before update on public.profiles for each row execute function public.prevent_profile_role_change();
+create or replace function public.handle_new_user() returns trigger language plpgsql security definer set search_path=public as $$ begin insert into public.profiles(id,full_name,role) values(new.id,coalesce(new.raw_user_meta_data->>'full_name',''),'renter'); return new; end $$;
+create trigger on_auth_user_created after insert on auth.users for each row execute function public.handle_new_user();

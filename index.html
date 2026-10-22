@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f6f4ed"><meta name="description" content="เช่าอุปกรณ์ท่องเที่ยวและชุดไทยจากร้านค้าและชุมชนท้องถิ่น"><title>ThaiGoShare — เที่ยวให้สุด เช่าให้คุ้ม</title><link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="ThaiGoShare หน้าแรก"><span class="brand-mark">T</span><span>ThaiGo<span class="green">Share</span><small>เที่ยวให้สุด เช่าให้คุ้ม</small></span></a>
+      <nav>
+        <a href="#catalog">เลือกเช่า</a><a href="#impact">ชุมชน</a><a href="#business">ธุรกิจ</a><a href="#why">เกี่ยวกับเรา</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="btn btn-outline" id="loginBtn">เข้าสู่ระบบ</button><button class="btn btn-dark" id="joinBtn">ลงทะเบียนร้านค้า</button><button class="menu-btn" aria-label="เมนู">☰</button>
+      </div>
+    </header>
+    <main id="home">
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">
+            <i></i>RENT LOCAL · TRAVEL MORE
+          </div>
+          <h1>ทุกทริปมีเรื่องราว<br>เริ่มต้นจาก<span class="green">การแบ่งปัน</span></h1><p>เช่าอุปกรณ์เที่ยวและชุดไทยง่ายขึ้น พร้อมสร้างรายได้ให้ร้านค้าและชุมชนท้องถิ่น</p>
+          <div class="hero-ctas">
+            <a class="btn btn-dark" href="#catalog">ค้นหาของให้เช่า<span>↗</span></a><a class="text-link" href="#matcher">✦ ลอง AI จัดเซ็ต<span>→</span></a>
+          </div>
+          <div class="hero-proof">
+            <div class="avatars">
+              <span>🏕️</span><span>🌿</span><span>📷</span>
+            </div>
+            <span>สนับสนุนร้านค้าในชุมชน<br><b>ทุกการเช่า สร้างคุณค่าให้ท้องถิ่น</b></span>
+          </div>
+        </div>
+        <div class="hero-art">
+          <img src="https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?auto=format&fit=crop&w=1200&q=85" alt="เต็นท์ท่ามกลางธรรมชาติยามเย็น">
+          <div class="image-label">
+            <span>✦</span>
+            <div>
+              <b>ออกไปใช้ชีวิต</b><small>ของดีจากคนท้องถิ่น</small>
+            </div>
+          </div>
+          <span class="sun">✳</span>
+        </div>
+        <span class="hero-side">LOCAL FINDS · MEANINGFUL TRIPS</span>
+      </section>
+      <section class="search-panel">
+        <div class="search-title">
+          <span class="search-icon">⌕</span>
+          <div>
+            <b>กำลังมองหาอะไรอยู่?</b><small>ค้นหาอุปกรณ์สำหรับทริปต่อไปของคุณ</small>
+          </div>
+        </div>
+        <label class="search-field"><span>⌕</span><input id="searchInput" placeholder="เช่น เต็นท์แคมป์ปิ้ง, ชุดไทย..."><button id="searchBtn" aria-label="ค้นหา">→</button></label><label class="select-field"><span>⌖</span><select id="areaFilter"><option value="">ทุกพื้นที่</option><option value="เขาใหญ่">เขาใหญ่</option><option value="วัดอรุณ">วัดอรุณ</option><option value="เยาวราช">เยาวราช</option></select></label><a href="#catalog" class="btn btn-green" id="discoverBtn">ค้นหาสินค้า</a>
+      </section>
+      <section class="section categories">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">
+              FIND YOUR NEXT ADVENTURE
+            </div>
+            <h2>เลือกตามสไตล์ทริป</h2>
+          </div>
+          <a class="text-link" href="#catalog">ดูทั้งหมด<span>→</span></a>
+        </div>
+        <div class="category-grid">
+          <button class="category-card cat-camp" data-category="camping"><span>🏕️</span><b>แคมป์ปิ้ง</b><small>เขาใหญ่ · 6 รายการ</small><i>↗</i></button><button class="category-card cat-thai" data-category="thai_dress"><span>👘</span><b>ชุดไทย</b><small>วัดอรุณ · 3 รายการ</small><i>↗</i></button><button class="category-card cat-camera" data-category="camera"><span>📸</span><b>กล้อง & ถ่ายภาพ</b><small>พร้อมเก็บทุกความทรงจำ</small><i>↗</i></button><button class="category-card cat-dive" data-category="diving"><span>🌊</span><b>ดำน้ำ</b><small>ออกไปค้นพบโลกใต้น้ำ</small><i>↗</i></button>
+        </div>
+      </section>
+      <section class="section catalog" id="catalog">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">
+              CURATED FOR YOUR JOURNEY
+            </div>
+            <h2>ของดีที่อยากแชร์<span class="green">กับคุณ</span></h2><p>คัดสรรจากร้านค้าและชุมชนท้องถิ่น เพื่อทุกการเดินทางที่พิเศษกว่าเดิม</p>
+          </div>
+          <span class="demo-tag">DEMO · ราคาสาธิต</span>
+        </div>
+        <div class="filters">
+          <div class="filter-pills">
+            <button class="filter-pill active" data-category="">ทั้งหมด</button><button class="filter-pill" data-category="camping">🏕️ แคมป์ปิ้ง</button><button class="filter-pill" data-category="thai_dress">👘 ชุดไทย</button><button class="filter-pill" data-category="camera">📷 กล้อง</button><button class="filter-pill" data-category="diving">🌊 ดำน้ำ</button>
+          </div>
+          <select id="sortFilter" aria-label="เรียงตามราคา"><option value="recommended">แนะนำ</option><option value="low">ราคาต่ำไปสูง</option><option value="high">ราคาสูงไปต่ำ</option></select>
+        </div>
+        <div class="product-grid" id="productGrid">
+          <p class="loading">กำลังโหลดสินค้า...</p>
+        </div>
+        <div class="center">
+          <button class="btn btn-outline" id="showAllBtn">ดูสินค้าทั้งหมด<span>→</span></button>
+        </div>
+      </section>
+      <section class="impact" id="impact">
+        <div class="impact-photo">
+          <img src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1000&q=85" alt="ที่พักแคมป์ปิ้งในชุมชน"><span class="photo-stamp">LOCAL<br>FIRST</span>
+        </div>
+        <div class="impact-copy">
+          <div class="eyebrow">
+            GOOD TRIPS, GOOD IMPACT
+          </div>
+          <h2>เที่ยวให้สนุก<br>พร้อมส่งต่อ<span>คุณค่า</span></h2><p>เมื่อคุณเช่ากับ ThaiGoShare รายได้ส่วนหนึ่งจะกลับไปสนับสนุนผู้ประกอบการท้องถิ่น ทุกทริปจึงมีความหมายมากกว่าแค่จุดหมาย</p>
+          <div class="impact-stats">
+            <div>
+              <b>12%</b><small>ค่าบริการแพลตฟอร์ม*</small>
+            </div>
+            <div>
+              <b>2%</b><small>กองทุนชุมชน**</small>
+            </div>
+            <div>
+              <b>100%</b><small>เรื่องราวท้องถิ่น</small>
+            </div>
+          </div>
+          <small class="fine-print">*สมมติฐานสำหรับการสาธิต · **รวมอยู่ในค่าบริการแพลตฟอร์ม</small><a class="btn btn-light" href="#business">รู้จักโมเดลของเรา<span>→</span></a>
+        </div>
+      </section>
+      <section class="section matcher" id="matcher">
+        <div class="matcher-card">
+          <div>
+            <div class="eyebrow">
+              YOUR PERSONAL TRIP PLANNER
+            </div>
+            <h2>ไม่รู้จะเช่าอะไร?<br><span class="green">ให้ AI ช่วยจัดเซ็ต</span></h2><p>บอกแผนเที่ยวของคุณ แล้วเราช่วยแนะนำไอเทมที่เหมาะกับทริป</p>
+            <div class="matcher-form">
+              <input id="tripInput" placeholder="เช่น ไปแคมป์เขาใหญ่ 3 วัน ฝนอาจตก"><button class="btn btn-dark" id="matchBtn">✦ จัดเซ็ตให้หน่อย</button>
+            </div>
+            <small id="matcherStatus">DEMO MODE · แนะนำจากหมวดสินค้า</small>
+          </div>
+          <div class="matcher-illustration">
+            ✦<span>🏕️</span><i>✧</i>
+          </div>
+        </div>
+        <div id="matchResults" class="match-results" hidden>
+        </div>
+        <div class="heritage-note">
+          <span>📍</span>
+          <div>
+            <b>Local Heritage Pack</b><p>เที่ยววัดอรุณและเยาวราช: แนะนำชุดไทยและอุปกรณ์ถ่ายภาพ ตรวจสอบกฎการแต่งกายและการถ่ายภาพกับสถานที่ก่อนเดินทาง</p>
+          </div>
+        </div>
+      </section>
+      <section class="business" id="business">
+        <div class="section business-inner">
+          <div>
+            <div class="eyebrow">
+              A MODEL THAT GIVES BACK
+            </div>
+            <h2>เติบโตไปพร้อม<br>กับชุมชน</h2><p>โมเดลรายได้โปร่งใส คำนวณจากค่าบริการการเช่า ไม่รวมเงินมัดจำ</p>
+            <div class="business-metrics">
+              <div>
+                <small>ค่าบริการแพลตฟอร์ม</small><b>12%</b>
+              </div>
+              <div>
+                <small>กองทุนชุมชนจากค่าบริการ</small><b>2%</b>
+              </div>
+              <div>
+                <small>สมาชิก Pro Lister (ตัวอย่าง)</small><b>฿199<span>/เดือน</span></b>
+              </div>
+            </div>
+            <a href="#why" class="text-link">อ่านโมเดลธุรกิจ<span>→</span></a>
+          </div>
+          <div class="calc-card">
+            <div class="calc-top">
+              <b>ประมาณการรายได้แพลตฟอร์ม</b><span>DEMO</span>
+            </div>
+            <label>ค่าเช่าเฉลี่ยต่อออเดอร์<strong id="avgValue">฿900</strong><input type="range" id="avgRent" min="200" max="3000" step="100" value="900"></label><label>จำนวนออเดอร์ต่อเดือน<strong id="ordersValue">120</strong><input type="range" id="orders" min="10" max="500" step="10" value="120"></label>
+            <div class="calc-result">
+              <span>รายได้ Commission / เดือน</span><b id="monthlyRevenue">฿12,960</b>
+            </div>
+            <small>ประมาณการจาก Commission 12% · ยังไม่หักต้นทุนการดำเนินงาน</small>
+          </div>
+        </div>
+      </section>
+      <section class="section why" id="why">
+        <div class="eyebrow">
+          WHY THAIGOSHARE
+        </div>
+        <div class="why-grid">
+          <h2>ของที่ต้องใช้<br>ไม่จำเป็นต้องซื้อ</h2>
+          <div>
+            <p>อุปกรณ์ท่องเที่ยวมีต้นทุนสูงเมื่อใช้เพียงไม่กี่ครั้ง ขณะที่ร้านเช่าท้องถิ่นควรเข้าถึงลูกค้าออนไลน์ได้ง่ายขึ้น</p>
+            <div class="comparison">
+              <span>เต็นท์ซื้อ (สมมติฐาน)</span><b>฿5,000</b><span>เต็นท์เช่า / วัน (ราคาสาธิต)</span><b>฿300</b>
+            </div>
+            <small>ตัวเลขตัวอย่างเพื่อสาธิต ยังไม่ได้ตรวจสอบกับร้านค้าหรือแหล่งราคา</small>
+          </div>
+        </div>
+        <div class="faq">
+          <details><summary>ใครรับผิดชอบเมื่อของเสียหาย?</summary><p>ปัจจุบันระบบเป็นต้นแบบ ผู้ให้เช่าและผู้เช่าควรตกลงเงื่อนไขก่อนส่งมอบ ระบบประกันเต็มรูปแบบอยู่ในแผนอนาคต</p></details><details><summary>ทำไมไม่ใช้ Facebook Marketplace?</summary><p>ThaiGoShare ออกแบบมาเพื่อรวมสินค้า วันว่าง ราคา และคำขอจองไว้ด้วยกัน ข้อมูลเปรียบเทียบคู่แข่งยังต้องตรวจสอบ</p></details><details><summary>รายได้แพลตฟอร์มมาจากไหน?</summary><p>โมเดลตัวอย่างใช้ค่าบริการ 12% และสมาชิก Pro Lister 199 บาทต่อเดือน ตัวเลขนี้เป็นสมมติฐานเพื่อการสาธิต</p></details><details><summary>จะพิสูจน์ได้อย่างไรว่ารายได้กลับถึงชุมชน?</summary><p>ระบบตัวอย่างแสดงกองทุน 2% จากค่าบริการ แต่การจ่ายเงินจริงและหลักฐานตรวจสอบยังไม่อยู่ในต้นแบบ</p></details>
+        </div>
+      </section>
+      <section class="roadmap">
+        <div>
+          <div class="eyebrow">
+            WHAT'S NEXT
+          </div>
+          <h2>กำลังเดินทางไปสู่<br>สิ่งที่ดีกว่า</h2>
+        </div>
+        <div class="roadmap-items">
+          <span>Escrow จริง<i>COMING SOON</i></span><span>Hub Drop-off<i>COMING SOON</i></span><span>ระบบประกันเต็มรูปแบบ<i>COMING SOON</i></span><span>Green Impact ที่ตรวจสอบแล้ว<i>COMING SOON</i></span>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <a class="brand" href="#home"><span class="brand-mark">T</span><span>ThaiGo<span class="green">Share</span><small>เที่ยวให้สุด เช่าให้คุ้ม</small></span></a><p>เช่าของดีจากชุมชน สร้างเรื่องราวดี ๆ ระหว่างทาง</p>
+      <div>
+        <a href="#business">Business Model</a><a href="#why">Why ThaiGoShare</a><a href="#home">Roadmap</a>
+      </div>
+      <small>© 2025 ThaiGoShare · Prototype for demonstration</small>
+    </footer>
+  </main>
+  <dialog id="productDialog" class="modal">
+    <button class="modal-close" data-close aria-label="ปิด">×</button>
+    <div id="productDetail">
+    </div>
+  </dialog>
+  <dialog id="authDialog" class="modal">
+    <button class="modal-close" data-close aria-label="ปิด">×</button>
+    <div class="auth-content">
+      <div class="eyebrow">
+        THAIGOSHARE ACCOUNT
+      </div>
+      <h2 id="authTitle">เข้าสู่ระบบ</h2><p>ระบบบัญชีต้องตั้งค่า Supabase ก่อนใช้งาน</p><input placeholder="อีเมล" type="email" disabled><input placeholder="รหัสผ่าน" type="password" disabled><button class="btn btn-dark" disabled>กำลังเตรียมระบบบัญชี</button><small>ระบบนี้ยังไม่รับหรือจัดเก็บข้อมูลบัญชี</small>
+    </div>
+  </dialog>
+  <dialog id="bookingDialog" class="modal">
+    <button class="modal-close" data-close aria-label="ปิด">×</button>
+    <div id="bookingContent">
+    </div>
+  </dialog>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

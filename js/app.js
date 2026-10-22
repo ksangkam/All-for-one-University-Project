@@ -1,0 +1,73 @@
+import { calculatePricing, rentalDaysBetween, formatBaht } from './pricing.js';
+
+const products = [
+  {id:'tent-2p',name:'เต็นท์แคมป์ปิ้ง 2 คน',category:'camping',area:'เขาใหญ่',dailyPrice:300,deposit:1000,shop:'บ้านป่าแคมป์',description:'เต็นท์กันฝนสำหรับ 2 คน พร้อมฟลายชีท เหมาะสำหรับทริปแคมป์ปิ้งช่วงสุดสัปดาห์',image:'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=720&q=80'},
+  {id:'tent-4p',name:'เต็นท์แคมป์ปิ้ง 4 คน',category:'camping',area:'เขาใหญ่',dailyPrice:450,deposit:1500,shop:'Khao Yai Outdoor',description:'พื้นที่กว้าง นอนสบายสำหรับครอบครัวหรือกลุ่มเพื่อน',image:'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?auto=format&fit=crop&w=720&q=80'},
+  {id:'chair',name:'เก้าอี้แคมป์ปิ้งพับได้',category:'camping',area:'เขาใหญ่',dailyPrice:80,deposit:300,shop:'บ้านป่าแคมป์',description:'เก้าอี้น้ำหนักเบา พับเก็บสะดวก รองรับน้ำหนักได้ดี',image:'https://images.unsplash.com/photo-1530789253388-582c481c54b0?auto=format&fit=crop&w=720&q=80'},
+  {id:'table',name:'โต๊ะพับแคมป์ปิ้ง',category:'camping',area:'เขาใหญ่',dailyPrice:120,deposit:500,shop:'Khao Yai Outdoor',description:'โต๊ะพับอลูมิเนียมสำหรับจัดเตรียมอาหารและนั่งพักผ่อน',image:'https://images.unsplash.com/photo-1475483768296-6163e08872a1?auto=format&fit=crop&w=720&q=80'},
+  {id:'stove',name:'เตาแก๊สพกพา',category:'camping',area:'เขาใหญ่',dailyPrice:100,deposit:500,shop:'บ้านป่าแคมป์',description:'เตาแก๊สพกพาสำหรับทำอาหารนอกสถานที่ (ไม่รวมกระป๋องแก๊ส)',image:'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=720&q=80'},
+  {id:'sleeping-bag',name:'ถุงนอนกันหนาว',category:'camping',area:'เขาใหญ่',dailyPrice:100,deposit:500,shop:'Khao Yai Outdoor',description:'ถุงนอนสำหรับอากาศเย็น ทำความสะอาดก่อนให้เช่าทุกครั้ง',image:'https://images.unsplash.com/photo-1504851149312-7a075b496cc7?auto=format&fit=crop&w=720&q=80'},
+  {id:'action-cam',name:'กล้อง Action Cam',category:'camera',area:'เขาใหญ่',dailyPrice:450,deposit:2000,shop:'Trip Shot Rental',description:'กล้องแอ็กชันกันน้ำพร้อมอุปกรณ์ยึดพื้นฐาน เหมาะกับกิจกรรมกลางแจ้ง',image:'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=720&q=80'},
+  {id:'power-bank',name:'พาวเวอร์แบงค์ 20,000 mAh',category:'camera',area:'เขาใหญ่',dailyPrice:80,deposit:500,shop:'Trip Shot Rental',description:'แบตเตอรี่สำรองความจุสูง พร้อมสายชาร์จ USB-C',image:'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=720&q=80'},
+  {id:'thai-classic',name:'ชุดไทยแบบดั้งเดิม',category:'thai_dress',area:'วัดอรุณ',dailyPrice:500,deposit:1000,shop:'อรุณไทยคอสตูม',description:'ชุดไทยพร้อมเครื่องประดับพื้นฐาน มีหลายขนาด กรุณาสอบถามก่อนจอง',image:'https://images.unsplash.com/photo-1610189012906-4c1f5de4d8c9?auto=format&fit=crop&w=720&q=80'},
+  {id:'thai-modern',name:'ชุดไทยประยุกต์',category:'thai_dress',area:'วัดอรุณ',dailyPrice:450,deposit:1000,shop:'อรุณไทยคอสตูม',description:'ชุดไทยร่วมสมัยพร้อมเครื่องประดับ เหมาะสำหรับถ่ายภาพท่องเที่ยว',image:'https://images.unsplash.com/photo-1583391733956-6c78276477e7?auto=format&fit=crop&w=720&q=80'},
+  {id:'thai-couple',name:'ชุดไทยถ่ายภาพคู่',category:'thai_dress',area:'เยาวราช',dailyPrice:900,deposit:2000,shop:'เยาวราช Heritage Wear',description:'ชุดคู่สำหรับสองท่าน สอบถามขนาดและรอบรับชุดกับร้านก่อนส่งคำขอ',image:'https://images.unsplash.com/photo-1610189022906-4c1f5de4d8c9?auto=format&fit=crop&w=720&q=80'},
+  {id:'snorkel',name:'ชุดดำน้ำสน็อกเกิล',category:'diving',area:'เขาใหญ่',dailyPrice:150,deposit:500,shop:'Trip Shot Rental',description:'หน้ากากและสน็อกเกิลสำหรับกิจกรรมทางน้ำ ตรวจสภาพก่อนใช้งานทุกครั้ง',image:'https://images.unsplash.com/photo-1530053969600-caed2596d242?auto=format&fit=crop&w=720&q=80'},
+];
+const $ = (q) => document.querySelector(q);
+const grid = $('#productGrid');
+let selectedCategory = '';
+let selectedProduct = null;
+const baht = (n) => `฿${new Intl.NumberFormat('th-TH').format(n)}`;
+function renderProducts() {
+  let list = products.filter(p => (!selectedCategory || p.category === selectedCategory) && (!$('#areaFilter').value || p.area === $('#areaFilter').value) && p.name.toLowerCase().includes($('#searchInput').value.trim().toLowerCase()));
+  if ($('#sortFilter').value === 'low') list.sort((a,b)=>a.dailyPrice-b.dailyPrice);
+  if ($('#sortFilter').value === 'high') list.sort((a,b)=>b.dailyPrice-a.dailyPrice);
+  grid.innerHTML = list.length ? list.map(p => `<article class="product-card"><div class="product-image"><img src="${p.image}" alt="${p.name}" loading="lazy"><span class="product-badge">${p.category==='camping'?'🏕️ แคมป์ปิ้ง':p.category==='thai_dress'?'👘 ชุดไทย':p.category==='diving'?'🌊 ดำน้ำ':'📷 ถ่ายภาพ'}</span><button class="save-btn" aria-label="บันทึกสินค้า" title="บันทึกยังไม่พร้อม">♡</button></div><div class="product-info"><span class="shop-name">${p.shop}</span><h3>${p.name}</h3><span class="product-area">⌖ ${p.area}</span><div class="product-bottom"><span class="price">${baht(p.dailyPrice)} <small>/ วัน</small></span><button data-view="${p.id}">ดูรายละเอียด →</button></div></div></article>`).join('') : '<p class="empty">ไม่พบสินค้าที่ตรงกับการค้นหา ลองเปลี่ยนตัวกรองดูนะ</p>';
+}
+function openProduct(p) {
+  selectedProduct = p;
+  $('#productDetail').innerHTML = `<img class="detail-image" src="${p.image}" alt="${p.name}"><div class="detail-content"><span class="shop-name">${p.shop} · ${p.area}</span><h2>${p.name}</h2><div class="detail-meta"><span>${baht(p.dailyPrice)} / วัน</span><span>มัดจำ ${baht(p.deposit)}</span></div><p>${p.description}</p><p><b>เงื่อนไข:</b> ตรวจสภาพสินค้าร่วมกับร้านก่อนรับคืน เงินมัดจำเป็นจำนวนตัวอย่างและตกลงกับร้านค้า</p><button class="btn btn-dark" id="goBooking">เลือกวันและส่งคำขอ →</button></div>`;
+  $('#productDialog').showModal();
+  $('#goBooking').onclick = () => { $('#productDialog').close(); openBooking(p); };
+}
+function openBooking(p) {
+  selectedProduct = p;
+  const today = new Date(); const iso = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+  const after = new Date(today); after.setDate(today.getDate()+4);
+  $('#bookingContent').innerHTML = `<div class="eyebrow">DEMO BOOKING</div><h2 style="font-family:Georgia;font-weight:400">ส่งคำขอจอง</h2><p class="shop-name">${p.name} · ${p.shop}</p><div class="booking-form"><label>วันรับสินค้า<input id="startDate" type="date" min="${iso(today)}" value="${iso(tomorrow)}"></label><label>วันคืนสินค้า<input id="endDate" type="date" min="${iso(today)}" value="${iso(after)}"></label><label class="check wide"><input id="protection" type="checkbox"> เพิ่ม Damage Protection (5% ของค่าเช่า)</label><div class="quote wide" id="priceQuote"></div><p class="disclaimer wide">DEMO ONLY · ยังไม่มีการตรวจสอบวันว่างหรือบันทึกการจองในฐานข้อมูล การชำระเงินจำลองไม่มีการตัดเงินจริง</p><button class="btn btn-dark wide" id="submitBooking">ดูสรุป Demo Checkout →</button></div>`;
+  $('#bookingDialog').showModal();
+  const update = () => {
+    try {
+      const days = rentalDaysBetween($('#startDate').value, $('#endDate').value);
+      const q = calculatePricing({dailyPrice:p.dailyPrice,rentalDays:days,deposit:p.deposit,protectionSelected:$('#protection').checked});
+      $('#priceQuote').innerHTML = `ค่าเช่า ${days} วัน <b>${baht(q.rentalTotal/100)}</b><br>Damage Protection <b>${baht(q.protectionFee/100)}</b><br>เงินมัดจำ <b>${baht(q.deposit/100)}</b><br><strong>ยอดชำระจำลอง</strong> <b>${baht(q.totalDue/100)}</b>`;
+      $('#submitBooking').disabled = false; $('#submitBooking').textContent = 'ดูสรุป Demo Checkout →';
+    } catch { $('#priceQuote').textContent = 'กรุณาเลือกวันคืนหลังวันรับสินค้า'; $('#submitBooking').disabled = true; }
+  };
+  $('#startDate').onchange = update; $('#endDate').onchange = update; $('#protection').onchange = update; update();
+  $('#submitBooking').onclick = () => {
+    const days = rentalDaysBetween($('#startDate').value, $('#endDate').value);
+    const q = calculatePricing({dailyPrice:p.dailyPrice,rentalDays:days,deposit:p.deposit,protectionSelected:$('#protection').checked});
+    $('#bookingContent').innerHTML = `<div class="eyebrow">DEMO CHECKOUT</div><h2 style="font-family:Georgia;font-weight:400">สรุปยอดชำระ</h2><p>${p.name} · ${days} วัน</p><div class="quote">ค่าเช่า <b>${baht(q.rentalTotal/100)}</b><br>Protection <b>${baht(q.protectionFee/100)}</b><br>มัดจำ (คืนตามเงื่อนไขร้าน) <b>${baht(q.deposit/100)}</b><br>Commission 12% (หักจากผู้ให้เช่า) <b>${baht(q.platformFee/100)}</b><br>กองทุนชุมชน (รวมใน Commission) <b>${baht(q.communityFund/100)}</b><hr><strong>ยอดรวม (ไม่มีการตัดเงินจริง)</strong> <b>${baht(q.totalDue/100)}</b></div><p class="disclaimer">การจองยังไม่ถูกส่งหรือบันทึก ขณะนี้ Backend/Supabase ยังไม่ได้ตั้งค่า จึงไม่สามารถยืนยันวันว่างและสร้างรายการจองจริงได้</p><button class="btn btn-dark" data-close>รับทราบ</button>`;
+    $('#bookingContent [data-close]').onclick = () => $('#bookingDialog').close();
+  };
+}
+grid.addEventListener('click', e => { const b=e.target.closest('[data-view]'); if(b) openProduct(products.find(p=>p.id===b.dataset.view)); });
+$('#searchInput').oninput = renderProducts; $('#searchBtn').onclick = renderProducts; $('#areaFilter').onchange = renderProducts; $('#sortFilter').onchange = renderProducts;
+document.querySelectorAll('[data-category]').forEach(b => b.onclick=()=>{selectedCategory=b.dataset.category;document.querySelectorAll('.filter-pill').forEach(x=>x.classList.toggle('active',x.dataset.category===selectedCategory));$('#catalog').scrollIntoView();renderProducts();});
+$('#showAllBtn').onclick = () => {selectedCategory='';$('#areaFilter').value='';$('#searchInput').value='';document.querySelectorAll('.filter-pill').forEach(x=>x.classList.toggle('active',!x.dataset.category));renderProducts();};
+$('#loginBtn').onclick = $('#joinBtn').onclick = () => $('#authDialog').showModal();
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+$('#avgRent').oninput = $('#orders').oninput = () => {const avg=Number($('#avgRent').value),orders=Number($('#orders').value);$('#avgValue').textContent=baht(avg);$('#ordersValue').textContent=orders;$('#monthlyRevenue').textContent=baht(Math.round(avg*orders*.12));};
+$('#matchBtn').onclick = () => {
+  const query=$('#tripInput').value.trim(); const result=$('#matchResults');
+  if(!query){$('#matcherStatus').textContent='กรุณาพิมพ์แผนทริปก่อน';return;}
+  const cats=/ไทย|วัดอรุณ|เยาวราช/.test(query)?['thai_dress','camera']:['camping','camera'];
+  const matches=products.filter(p=>cats.includes(p.category)).slice(0,3);
+  result.hidden=false; result.innerHTML=matches.map(p=>`<div class="match-item"><b>${p.name}</b><p>${p.description}</p><span>${baht(p.dailyPrice)} / วัน</span><br><button data-match="${p.id}" class="text-link" style="border:0;background:none;padding:8px 0">ดูสินค้า →</button></div>`).join('');
+  $('#matcherStatus').textContent='DEMO FALLBACK · แนะนำจากสินค้าที่มีอยู่จริงในตัวอย่าง';
+  result.querySelectorAll('[data-match]').forEach(b=>b.onclick=()=>{document.querySelector('#catalog').scrollIntoView();openProduct(products.find(p=>p.id===b.dataset.match));});
+};
+$('#avgRent').dispatchEvent(new Event('input'));renderProducts();
