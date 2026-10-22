@@ -1,10 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap');
 :root {
-  --green: #526b45;
-  --green-dark: #354b31;
-  --cream: #f6f4ed;
-  --sand: #e8e2d3;
-  --ink: #252820;
+  --green: #244c3a;
+  --green-dark: #19382a;
+  --cream: #f7f4ea;
+  --sand: #d9e5d6;
+  --sage: #d9e5d6;
+  --terracotta: #c77b52;
+  --gold: #d6b875;
+  --charcoal: #29332e;
+  --ink: #29332e;
   --muted: #77796f;
   --line: #e3e1d8;
   --white: #fff;
@@ -262,7 +266,7 @@ button {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(0deg,rgba(21,29,18,.25),transparent 45%);
+  background: rgba(21,29,18,.12);
   pointer-events: none;
 }
 
@@ -812,6 +816,88 @@ button {
   color: #8c9a7b;
   position: relative;
   flex: none;
+}
+
+/* Shared visual language: nature editorial, soft minimal and heritage accents. */
+.btn,
+.product-card,
+.category-card,
+.search-panel,
+.matcher-card,
+.calc-card,
+.modal,
+.product-image,
+.heritage-note {
+  border-radius: 16px;
+}
+
+.product-card {
+  box-shadow: 0 5px 18px rgba(41, 51, 46, .055);
+}
+
+.product-image {
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+}
+
+.btn-dark,
+.btn-green {
+  background: var(--green);
+}
+
+.btn-dark:hover,
+.btn-green:hover {
+  background: var(--green-dark);
+}
+
+.cat-camp,
+.cat-camera,
+.cat-dive,
+.matcher-card,
+.matcher-illustration {
+  background-color: var(--sage);
+}
+
+.cat-thai {
+  background-color: #efe5cc;
+}
+
+.product-badge,
+.demo-tag {
+  border-radius: 999px;
+}
+
+.search-field,
+.select-field,
+.matcher-form input,
+.booking-form input,
+.auth-content input,
+.calc-card {
+  border-radius: 10px;
+}
+
+:where(a, button, input, select, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--terracotta);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: .56;
+}
+
+::selection {
+  background: var(--sage);
+  color: var(--charcoal);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
 .matcher-illustration span {
@@ -1551,4 +1637,50 @@ footer>small {
   .matcher-illustration {
     display: none;
   };
+}
+
+/* Nature Editorial × Modern Thai Heritage shared art direction */
+:root {
+  --green: #244c3a;
+  --green-dark: #19382a;
+  --cream: #f7f4ea;
+  --sand: #d9e5d6;
+  --sage: #d9e5d6;
+  --terracotta: #c77b52;
+  --gold: #d6b875;
+  --charcoal: #29332e;
+  --ink: #29332e;
+  --muted: #686f68;
+  --line: #e4e3d9;
+}
+
+body { background: var(--cream); color: var(--charcoal); }
+.topbar { background: var(--cream); border-color: var(--line); backdrop-filter: none; }
+.modal::backdrop { backdrop-filter: none; }
+.btn, .search-field, .select-field, .filter-pill, .filters select, .category-card,
+.product-card, .matcher-card, .calc-card, .modal, .heritage-note { border-radius: 16px; }
+.btn-dark, .btn-green, .brand-mark, .search-field button, .filter-pill.active { background-color: var(--green); }
+.product-card { box-shadow: 0 5px 18px rgba(41,51,46,.055); transition: transform .18s ease, box-shadow .18s ease; }
+.product-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(41,51,46,.1); }
+.product-image { overflow: hidden; }
+.cat-camp, .cat-camera, .cat-dive, .matcher-card { background: var(--sage); }
+.cat-thai { background: #eee4cc; }
+.matcher-illustration { background: #cbdac9; }
+.heritage-note { background: #f1ead8; border-left: 3px solid var(--gold); }
+.demo-tag, .product-badge { border-radius: 20px; }
+.impact { background: var(--green); }
+.business { background: #eeeee6; }
+:focus-visible { outline: 3px solid var(--terracotta); outline-offset: 3px; }
+button:disabled { cursor: not-allowed; opacity: .65; transform: none; }
+.save-btn[aria-pressed="true"] { color: var(--terracotta); background: #fff; }
+@media (max-width: 760px) {
+  .topbar nav { display: none; }
+  .topbar.nav-open { flex-wrap: wrap; height: auto; min-height: 68px; padding-bottom: 12px; }
+  .topbar.nav-open nav { order: 3; display: flex; flex-direction: column; flex-basis: 100%; gap: 0; padding: 8px 0; }
+  .topbar.nav-open nav a { padding: 10px 4px; border-top: 1px solid var(--line); }
+  .topbar.nav-open .nav-actions { display: flex; order: 2; }
+  .topbar.nav-open .nav-actions .btn { display: inline-flex; padding: 9px 10px; font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }

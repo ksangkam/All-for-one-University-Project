@@ -23,7 +23,7 @@ function renderProducts() {
   let list = products.filter(p => (!selectedCategory || p.category === selectedCategory) && (!$('#areaFilter').value || p.area === $('#areaFilter').value) && p.name.toLowerCase().includes($('#searchInput').value.trim().toLowerCase()));
   if ($('#sortFilter').value === 'low') list.sort((a,b)=>a.dailyPrice-b.dailyPrice);
   if ($('#sortFilter').value === 'high') list.sort((a,b)=>b.dailyPrice-a.dailyPrice);
-  grid.innerHTML = list.length ? list.map(p => `<article class="product-card"><div class="product-image"><img src="${p.image}" alt="${p.name}" loading="lazy"><span class="product-badge">${p.category==='camping'?'🏕️ แคมป์ปิ้ง':p.category==='thai_dress'?'👘 ชุดไทย':p.category==='diving'?'🌊 ดำน้ำ':'📷 ถ่ายภาพ'}</span><button class="save-btn" aria-label="บันทึกสินค้า" title="บันทึกยังไม่พร้อม">♡</button></div><div class="product-info"><span class="shop-name">${p.shop}</span><h3>${p.name}</h3><span class="product-area">⌖ ${p.area}</span><div class="product-bottom"><span class="price">${baht(p.dailyPrice)} <small>/ วัน</small></span><button data-view="${p.id}">ดูรายละเอียด →</button></div></div></article>`).join('') : '<p class="empty">ไม่พบสินค้าที่ตรงกับการค้นหา ลองเปลี่ยนตัวกรองดูนะ</p>';
+  grid.innerHTML = list.length ? list.map(p => `<article class="product-card"><div class="product-image"><img src="${p.image}" alt="${p.name}" loading="lazy"><span class="product-badge">${p.category==='camping'?'⌂ แคมป์ปิ้ง':p.category==='thai_dress'?'✧ ชุดไทย':p.category==='diving'?'≈ ดำน้ำ':'◉ ถ่ายภาพ'}</span><button class="save-btn" data-save="${p.id}" aria-label="บันทึก ${p.name}" aria-pressed="false" title="บันทึกรายการนี้">♡</button></div><div class="product-info"><span class="shop-name">${p.shop}</span><h3>${p.name}</h3><span class="product-area">⌖ ${p.area}</span><div class="product-bottom"><span class="price">${baht(p.dailyPrice)} <small>/ วัน</small></span><button data-view="${p.id}">ดูรายละเอียด →</button></div></div></article>`).join('') : '<p class="empty">ไม่พบสินค้าที่ตรงกับการค้นหา ลองเปลี่ยนตัวกรองดูนะ</p>';
 }
 function openProduct(p) {
   selectedProduct = p;
@@ -54,12 +54,36 @@ function openBooking(p) {
     $('#bookingContent [data-close]').onclick = () => $('#bookingDialog').close();
   };
 }
-grid.addEventListener('click', e => { const b=e.target.closest('[data-view]'); if(b) openProduct(products.find(p=>p.id===b.dataset.view)); });
+grid.addEventListener('click', e => {
+  const save = e.target.closest('[data-save]');
+  if (save) {
+    const isSaved = save.getAttribute('aria-pressed') === 'true';
+    save.setAttribute('aria-pressed', String(!isSaved));
+    save.textContent = isSaved ? '♡' : '♥';
+    save.title = isSaved ? 'บันทึกรายการนี้' : 'นำออกจากรายการที่บันทึก';
+    return;
+  }
+  const b=e.target.closest('[data-view]'); if(b) openProduct(products.find(p=>p.id===b.dataset.view));
+});
 $('#searchInput').oninput = renderProducts; $('#searchBtn').onclick = renderProducts; $('#areaFilter').onchange = renderProducts; $('#sortFilter').onchange = renderProducts;
 document.querySelectorAll('[data-category]').forEach(b => b.onclick=()=>{selectedCategory=b.dataset.category;document.querySelectorAll('.filter-pill').forEach(x=>x.classList.toggle('active',x.dataset.category===selectedCategory));$('#catalog').scrollIntoView();renderProducts();});
 $('#showAllBtn').onclick = () => {selectedCategory='';$('#areaFilter').value='';$('#searchInput').value='';document.querySelectorAll('.filter-pill').forEach(x=>x.classList.toggle('active',!x.dataset.category));renderProducts();};
 $('#loginBtn').onclick = $('#joinBtn').onclick = () => $('#authDialog').showModal();
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+const menuButton = $('.menu-btn');
+menuButton.onclick = () => {
+  const open = menuButton.getAttribute('aria-expanded') !== 'true';
+  menuButton.setAttribute('aria-expanded', String(open));
+  menuButton.setAttribute('aria-label', open ? 'ปิดเมนู' : 'เปิดเมนู');
+  $('.topbar').classList.toggle('nav-open', open);
+};
+$('.topbar nav').addEventListener('click', event => {
+  if (event.target.closest('a')) {
+    $('.topbar').classList.remove('nav-open');
+    menuButton.setAttribute('aria-expanded', 'false');
+    menuButton.setAttribute('aria-label', 'เปิดเมนู');
+  }
+});
 $('#avgRent').oninput = $('#orders').oninput = () => {const avg=Number($('#avgRent').value),orders=Number($('#orders').value);$('#avgValue').textContent=baht(avg);$('#ordersValue').textContent=orders;$('#monthlyRevenue').textContent=baht(Math.round(avg*orders*.12));};
 $('#matchBtn').onclick = () => {
   const query=$('#tripInput').value.trim(); const result=$('#matchResults');
