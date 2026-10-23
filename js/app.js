@@ -21,13 +21,49 @@ const grid = $('#productGrid');
 let selectedCategory = '';
 let selectedProduct = null;
 const baht = (n) => `฿${new Intl.NumberFormat('th-TH').format(n)}`;
+const productNameOf = product => product.productName ?? product.name ?? '';
+const priceOf = product => product.pricePerDay ?? product.dailyPrice;
+const sellerOf = product => product.sellerName ?? product.shop ?? '';
+const imageOf = product => product.imageUrl ?? product.image ?? '';
+const escapeHTML = (value) => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+function renderProductCard(product) {
+  const productName = productNameOf(product);
+  const sellerName = sellerOf(product);
+  const pricePerDay = priceOf(product);
+  const imageUrl = imageOf(product);
+  const hasRating = product.rating !== undefined && product.rating !== null && Number.isFinite(Number(product.rating));
+  const hasReviewCount = product.reviewCount !== undefined && product.reviewCount !== null && Number.isFinite(Number(product.reviewCount));
+  const rating = hasRating && hasReviewCount
+    ? `<span>${escapeHTML(product.rating)}</span><span class="product-review-count">${escapeHTML(product.reviewCount)} reviews</span>`
+    : '<span class="product-review-count">ยังไม่มีรีวิว</span>';
+  const name = escapeHTML(productName);
+  return `<article class="product-card">
+    <div class="product-image"><img src="${escapeHTML(imageUrl)}" alt="${name}" loading="lazy">
+      <button class="save-btn" type="button" data-save="${escapeHTML(product.id)}" aria-label="บันทึก ${name}" aria-pressed="false" title="บันทึกรายการนี้">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg>
+      </button>
+    </div>
+    <div class="product-info">
+      <h3>${name}</h3><span class="shop-name">${escapeHTML(sellerName)}</span>
+      <div class="product-rating" role="img" aria-label="${hasRating && hasReviewCount ? `Rating ${escapeHTML(product.rating)} out of 5, ${escapeHTML(product.reviewCount)} reviews` : 'ยังไม่มีคะแนนรีวิว'}">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m10 1.8 2.5 5.1 5.7.8-4.1 4 .9 5.7-5-2.7-5 2.7.9-5.7-4.1-4 5.7-.8L10 1.8Z"/></svg>${rating}
+      </div>
+      <div class="product-bottom"><span class="price">${baht(pricePerDay)} <small>/ วัน</small></span>
+        <button class="product-see-more" type="button" data-view="${escapeHTML(product.id)}" aria-label="See more about ${name}">See more
+          <span class="product-see-more-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4 10h11m-4-4 4 4-4 4"/></svg></span>
+        </button>
+      </div>
+    </div>
+  </article>`;
+}
 function renderProducts() {
-  let list = products.filter(p => (!selectedCategory || p.category === selectedCategory) && (!$('#areaFilter').value || p.area === $('#areaFilter').value) && p.name.toLowerCase().includes($('#searchInput').value.trim().toLowerCase()));
-  if ($('#sortFilter').value === 'low') list.sort((a,b)=>a.dailyPrice-b.dailyPrice);
-  if ($('#sortFilter').value === 'high') list.sort((a,b)=>b.dailyPrice-a.dailyPrice);
-  grid.innerHTML = list.length ? list.map(p => `<article class="product-card"><div class="product-image"><img src="${p.image}" alt="${p.name}" loading="lazy"><span class="product-badge">${p.category==='camping'?'⌂ แคมป์ปิ้ง':p.category==='thai_dress'?'✧ ชุดไทย':p.category==='diving'?'≈ ดำน้ำ':'◉ ถ่ายภาพ'}</span><button class="save-btn" data-save="${p.id}" aria-label="บันทึก ${p.name}" aria-pressed="false" title="บันทึกรายการนี้">♡</button></div><div class="product-info"><span class="shop-name">${p.shop}</span><h3>${p.name}</h3><span class="product-area">⌖ ${p.area}</span><div class="product-bottom"><span class="price">${baht(p.dailyPrice)} <small>/ วัน</small></span><button data-view="${p.id}">ดูรายละเอียด →</button></div></div></article>`).join('') : '<p class="empty">ไม่พบสินค้าที่ตรงกับการค้นหา ลองเปลี่ยนตัวกรองดูนะ</p>';
+  let list = products.filter(p => (!selectedCategory || p.category === selectedCategory) && (!$('#areaFilter').value || p.area === $('#areaFilter').value) && productNameOf(p).toLowerCase().includes($('#searchInput').value.trim().toLowerCase()));
+  if ($('#sortFilter').value === 'low') list.sort((a,b)=>priceOf(a)-priceOf(b));
+  if ($('#sortFilter').value === 'high') list.sort((a,b)=>priceOf(b)-priceOf(a));
+  grid.innerHTML = list.length ? list.map(renderProductCard).join('') : '<p class="empty">ไม่พบสินค้าที่ตรงกับการค้นหา ลองเปลี่ยนตัวกรองดูนะ</p>';
 }
 function openProduct(p) {
+  p = { ...p, name: productNameOf(p), shop: sellerOf(p), dailyPrice: priceOf(p), image: imageOf(p) };
   selectedProduct = p;
   $('#productDetail').innerHTML = `<img class="detail-image" src="${p.image}" alt="${p.name}"><div class="detail-content"><span class="shop-name">${p.shop} · ${p.area}</span><h2>${p.name}</h2><div class="detail-meta"><span>${baht(p.dailyPrice)} / วัน</span><span>มัดจำ ${baht(p.deposit)}</span></div><p>${p.description}</p><p><b>เงื่อนไข:</b> ตรวจสภาพสินค้าร่วมกับร้านก่อนรับคืน เงินมัดจำเป็นจำนวนตัวอย่างและตกลงกับร้านค้า</p><button class="btn btn-dark" id="goBooking">เลือกวันและส่งคำขอ →</button></div>`;
   $('#productDialog').showModal();
@@ -59,13 +95,19 @@ function openBooking(p) {
 grid.addEventListener('click', e => {
   const save = e.target.closest('[data-save]');
   if (save) {
+    const product = products.find(item => item.id === save.dataset.save);
     const isSaved = save.getAttribute('aria-pressed') === 'true';
+    product?.onFavoriteClick?.(product, e);
     save.setAttribute('aria-pressed', String(!isSaved));
-    save.textContent = isSaved ? '♡' : '♥';
     save.title = isSaved ? 'บันทึกรายการนี้' : 'นำออกจากรายการที่บันทึก';
     return;
   }
-  const b=e.target.closest('[data-view]'); if(b) openProduct(products.find(p=>p.id===b.dataset.view));
+  const b=e.target.closest('[data-view]');
+  if (b) {
+    const product = products.find(item => item.id === b.dataset.view);
+    if (product?.onSeeMoreClick) product.onSeeMoreClick(product, e);
+    else if (product) openProduct(product);
+  }
 });
 $('#searchInput').oninput = renderProducts; $('#searchBtn').onclick = renderProducts; $('#areaFilter').onchange = renderProducts; $('#sortFilter').onchange = renderProducts;
 document.querySelectorAll('[data-category]').forEach(b => b.onclick=()=>{selectedCategory=b.dataset.category;document.querySelectorAll('.filter-pill').forEach(x=>x.classList.toggle('active',x.dataset.category===selectedCategory));$('#catalog').scrollIntoView();renderProducts();});
