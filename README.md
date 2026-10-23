@@ -8,9 +8,19 @@ The app uses ES modules. Start a static server from this directory, for example 
 
 ## Supabase setup
 
-Create a Supabase project and run `supabase/schema.sql`. Create a trusted owner through the dashboard or private admin script; signups are assigned renter role. Replace the placeholder owner UUID in `supabase/seed.sql` with that trusted profile UUID, then run the seed. Seed item IDs are stable and repeatable. SQL stores money in integer satang, applies RLS, blocks overlapping pending/confirmed bookings with a PostgreSQL exclusion constraint, and provides atomic `create_booking` and owner status-transition RPCs. The current browser app does not call these services; reservations are not persisted or availability-checked.
+Create a Supabase project and run these SQL files in order from the SQL Editor:
 
-Copy `.env.example` to `.env.local` when deploying/configuring. The Supabase anon key is public; never put a service role key or OpenAI key in client code. The OpenAI endpoint is not implemented in this demo.
+1. `supabase/schema.sql`
+2. `supabase/owner_portal.sql`
+3. `supabase/seed.sql` (replace the example owner UUID with a real approved owner profile, or seed after an owner has been approved)
+
+Set the project's Site URL and allowed redirect URLs in Supabase Auth for your local server and deployed domain. Copy the Supabase project URL and **public anon/publishable key** into `js/supabase-config.js`. The anon key is intended for browser use; never put a service role key there. The static site cannot read `.env.local` directly, so `.env.example` documents the names but the browser values belong in the config module.
+
+All new signups get the `renter` role. A shop signup creates a pending `owner_applications` record, not owner privileges. Review the request in Supabase and run the approval transaction at the bottom of `supabase/owner_portal.sql` using a trusted SQL Editor session; client-side role changes are blocked. Owners can then create their shop and manage its listings from `dashboard/owner.html`. Product write policies scope all listing actions to the signed-in shop owner. RLS protects data even if someone bypasses the UI.
+
+Money is stored in integer satang. The schema applies RLS, blocks overlapping pending/confirmed bookings with a PostgreSQL exclusion constraint, and provides atomic `create_booking` and owner status-transition RPCs. The existing public demo checkout still does not submit reservations or payments.
+
+The `.env.example` is for documenting deployment settings and a future server-side endpoint; it is not loaded by the static browser app. The Supabase anon key is public; never put a service role key or OpenAI key in client code. The OpenAI endpoint is not implemented in this demo.
 
 ## Implemented demo flows
 
@@ -19,7 +29,8 @@ Copy `.env.example` to `.env.local` when deploying/configuring. The Supabase ano
 - Checkout is display-only and does not submit a booking or take payment.
 - AI matcher uses deterministic fallback categories matched to actual demo products; it does not call OpenAI.
 - Business calculator estimates commission only, with illustrative values.
-- Auth controls are disabled placeholders until Supabase Auth is wired.
+- Email/password signup and login, including renter registration and pending owner applications (requires Supabase config and enabled email provider).
+- Owner dashboard with first-shop setup and create, edit, show/hide product listings (requires `schema.sql` and `owner_portal.sql`).
 
 ## Pricing tests
 
@@ -46,4 +57,4 @@ Tune the constants near the top of that module:
 
 ## Remaining before launch
 
-Connect Supabase Auth/catalog and booking RPCs, build owner/renter dashboards, implement a validated/rate-limited server-side AI endpoint, verify terms/prices with partner shops, use licensed product imagery, test configured integrations and deploy. No public URL or demo accounts are configured.
+Connect booking submission and renter dashboard, implement a validated/rate-limited server-side AI endpoint, verify terms/prices with partner shops, use licensed product imagery, configure Supabase credentials, test configured integrations and deploy. No public URL or demo accounts are configured.

@@ -220,18 +220,41 @@
   </dialog>
   <dialog id="authDialog" class="modal">
     <button class="modal-close" data-close aria-label="ปิด">×</button>
-    <div class="auth-content">
+    <form class="auth-content" id="authForm">
       <div class="eyebrow">
         THAIGOSHARE ACCOUNT
       </div>
-      <h2 id="authTitle">เข้าสู่ระบบ</h2><p>ระบบบัญชีต้องตั้งค่า Supabase ก่อนใช้งาน</p><input placeholder="อีเมล" type="email" disabled><input placeholder="รหัสผ่าน" type="password" disabled><button class="btn btn-dark" disabled>กำลังเตรียมระบบบัญชี</button><small>ระบบนี้ยังไม่รับหรือจัดเก็บข้อมูลบัญชี</small>
-    </div>
+      <h2 id="authTitle">เข้าสู่ระบบ</h2>
+      <p id="authDescription">เข้าสู่ระบบเพื่อจัดการบัญชีและรายการเช่า</p>
+      <div id="registerFields" hidden>
+        <label for="authFullName">ชื่อที่ใช้แสดง</label>
+        <input id="authFullName" name="fullName" autocomplete="name" maxlength="120" placeholder="ชื่อของคุณ">
+        <label for="accountType">ประเภทบัญชี</label>
+        <select id="accountType" name="accountType">
+          <option value="renter">ผู้เช่า</option>
+          <option value="owner">สมัครเป็นผู้ให้เช่า</option>
+        </select>
+        <div id="authOwnerFields" hidden>
+          <label for="ownerShopName">ชื่อร้าน</label><input id="ownerShopName" name="shopName" maxlength="120" placeholder="ชื่อร้านหรือผู้ให้บริการ">
+          <label for="ownerArea">พื้นที่ให้บริการ</label><select id="ownerArea" name="area"><option value="เขาใหญ่">เขาใหญ่</option><option value="วัดอรุณ">วัดอรุณ</option><option value="เยาวราช">เยาวราช</option></select>
+          <label for="ownerContact">ช่องทางติดต่อ</label><input id="ownerContact" name="contactInfo" maxlength="200" placeholder="เบอร์โทรหรือ LINE">
+          <label for="ownerDescription">แนะนำร้าน</label><textarea id="ownerDescription" name="shopDescription" maxlength="600" rows="3" placeholder="ประเภทสินค้าและบริการ"></textarea>
+          <small>บัญชีผู้ให้เช่าต้องได้รับการตรวจสอบก่อนลงสินค้า</small>
+        </div>
+      </div>
+      <label for="authEmail">อีเมล</label><input id="authEmail" name="email" placeholder="name@example.com" type="email" autocomplete="email" required>
+      <label for="authPassword">รหัสผ่าน</label><input id="authPassword" name="password" placeholder="อย่างน้อย 8 ตัวอักษร" type="password" minlength="8" autocomplete="current-password" required>
+      <p id="authStatus" class="form-status" role="status" aria-live="polite"></p>
+      <button class="btn btn-dark" id="authSubmit" type="submit">เข้าสู่ระบบ</button>
+      <button class="text-link auth-mode-toggle" id="authModeToggle" type="button">ยังไม่มีบัญชี? สมัครสมาชิก</button>
+    </form>
   </dialog>
   <dialog id="bookingDialog" class="modal">
     <button class="modal-close" data-close aria-label="ปิด">×</button>
     <div id="bookingContent">
     </div>
   </dialog>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

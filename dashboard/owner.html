@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f4ed">
+  <title>จัดการร้านค้า — ThaiGoShare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="owner-page">
+  <header class="topbar owner-topbar">
+    <a class="brand" href="../index.html" aria-label="ThaiGoShare หน้าแรก"><span class="brand-mark">T</span><span>ThaiGo<span class="green">Share</span><small>จัดการร้านค้า</small></span></a>
+    <nav aria-label="เมนูบัญชี"><a href="../index.html#catalog">เลือกเช่า</a><a href="../index.html#business">เกี่ยวกับเรา</a></nav>
+    <div class="nav-actions"><button class="btn btn-outline" id="ownerSignOut" type="button">ออกจากระบบ</button></div>
+  </header>
+  <main class="owner-dashboard section">
+    <div class="owner-page-heading"><div class="eyebrow">OWNER WORKSPACE</div><h1>จัดการร้านค้า</h1><p>เพิ่มและแก้ไขรายการเช่าของคุณ ข้อมูลจะถูกบันทึกในบัญชีร้านค้า</p></div>
+    <p id="ownerStatus" class="form-status" role="status" aria-live="polite">กำลังตรวจสอบบัญชี…</p>
+    <section id="ownerApplicationPanel" class="owner-panel" hidden>
+      <h2 id="applicationHeading">คำขอเปิดร้านค้า</h2>
+      <p id="applicationDescription">การสมัครร้านค้ารอการตรวจสอบจากทีมงาน</p>
+      <form id="shopForm" class="owner-form" hidden>
+        <label for="shopName">ชื่อร้าน</label><input id="shopName" name="shopName" required maxlength="120">
+        <label for="shopArea">พื้นที่ให้บริการ</label><select id="shopArea" name="area"><option value="เขาใหญ่">เขาใหญ่</option><option value="วัดอรุณ">วัดอรุณ</option><option value="เยาวราช">เยาวราช</option></select>
+        <label for="shopContact">ช่องทางติดต่อ</label><input id="shopContact" name="contact" required maxlength="200" placeholder="เบอร์โทรหรือ LINE">
+        <label for="shopDescription">แนะนำร้าน</label><textarea id="shopDescription" name="description" maxlength="600" rows="3"></textarea>
+        <button class="btn btn-dark" type="submit">ส่งคำขอเปิดร้าน</button>
+      </form>
+      <button id="resubmitApplication" class="btn btn-outline" type="button" hidden>ส่งคำขออีกครั้ง</button>
+    </section>
+    <section id="shopSetupPanel" class="owner-panel" hidden>
+      <h2>ข้อมูลร้านของคุณ</h2><p>เพิ่มรายละเอียดร้านก่อนเริ่มลงสินค้า</p>
+      <form id="shopSetupForm" class="owner-form">
+        <label for="newShopName">ชื่อร้าน</label><input id="newShopName" required maxlength="120">
+        <label for="newShopArea">พื้นที่ให้บริการ</label><select id="newShopArea"><option value="เขาใหญ่">เขาใหญ่</option><option value="วัดอรุณ">วัดอรุณ</option><option value="เยาวราช">เยาวราช</option></select>
+        <label for="newShopContact">ช่องทางติดต่อ</label><input id="newShopContact" required maxlength="200">
+        <label for="newShopDescription">แนะนำร้าน</label><textarea id="newShopDescription" maxlength="600" rows="3"></textarea>
+        <button class="btn btn-dark" type="submit">บันทึกข้อมูลร้าน</button>
+      </form>
+    </section>
+    <section id="productsPanel" class="owner-products" hidden>
+      <div class="owner-section-heading"><div><div class="eyebrow">YOUR LISTINGS</div><h2>สินค้าสำหรับให้เช่า</h2></div><button id="newProductBtn" class="btn btn-dark" type="button">+ เพิ่มสินค้า</button></div>
+      <form id="productForm" class="owner-panel owner-form product-editor" hidden>
+        <h3 id="productFormTitle">เพิ่มสินค้าใหม่</h3><input id="productId" type="hidden">
+        <label for="productName">ชื่อสินค้า</label><input id="productName" required maxlength="160">
+        <label for="productCategory">หมวดหมู่</label><select id="productCategory"><option value="camping">แคมป์ปิ้ง</option><option value="thai_dress">ชุดไทย</option><option value="camera">กล้อง</option><option value="diving">ดำน้ำ</option></select>
+        <label for="productArea">พื้นที่รับสินค้า</label><select id="productArea"><option value="เขาใหญ่">เขาใหญ่</option><option value="วัดอรุณ">วัดอรุณ</option><option value="เยาวราช">เยาวราช</option></select>
+        <label for="productPrice">ค่าเช่าต่อวัน (บาท)</label><input id="productPrice" type="number" min="0" step="1" required>
+        <label for="productDeposit">เงินมัดจำ (บาท)</label><input id="productDeposit" type="number" min="0" step="1" value="0" required>
+        <label for="productImage">URL รูปภาพ (ถ้ามี)</label><input id="productImage" type="url" maxlength="1000" placeholder="https://…">
+        <label for="productCondition">สภาพสินค้า</label><input id="productCondition" maxlength="300" placeholder="เช่น สภาพดี พร้อมใช้งาน">
+        <label for="productDescription">รายละเอียด</label><textarea id="productDescription" maxlength="2000" rows="4"></textarea>
+        <label class="owner-checkbox"><input id="productActive" type="checkbox" checked> แสดงสินค้าในแคตตาล็อก</label>
+        <div class="owner-form-actions"><button class="btn btn-dark" type="submit">บันทึกรายการ</button><button id="cancelProductEdit" class="btn btn-outline" type="button">ยกเลิก</button></div>
+      </form>
+      <div id="ownerProductList" class="owner-list" aria-live="polite"></div>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="../js/owner-dashboard.js"></script>
+</body>
+</html>

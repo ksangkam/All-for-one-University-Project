@@ -1,8 +1,10 @@
 import { calculatePricing, rentalDaysBetween, formatBaht } from './pricing.js';
 import { initMagneticButtons } from './magnetic-buttons.js';
 import { initFaqAnimations } from './faq.js';
+import { initAuth } from './auth.js';
+import { getSupabase } from './supabase-client.js';
 
-const products = [
+let products = [
   {id:'tent-2p',name:'เต็นท์แคมป์ปิ้ง 2 คน',category:'camping',area:'เขาใหญ่',dailyPrice:300,deposit:1000,shop:'บ้านป่าแคมป์',description:'เต็นท์กันฝนสำหรับ 2 คน พร้อมฟลายชีท เหมาะสำหรับทริปแคมป์ปิ้งช่วงสุดสัปดาห์',image:'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=720&q=80'},
   {id:'tent-4p',name:'เต็นท์แคมป์ปิ้ง 4 คน',category:'camping',area:'เขาใหญ่',dailyPrice:450,deposit:1500,shop:'Khao Yai Outdoor',description:'พื้นที่กว้าง นอนสบายสำหรับครอบครัวหรือกลุ่มเพื่อน',image:'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?auto=format&fit=crop&w=720&q=80'},
   {id:'chair',name:'เก้าอี้แคมป์ปิ้งพับได้',category:'camping',area:'เขาใหญ่',dailyPrice:80,deposit:300,shop:'บ้านป่าแคมป์',description:'เก้าอี้น้ำหนักเบา พับเก็บสะดวก รองรับน้ำหนักได้ดี',image:'https://images.unsplash.com/photo-1530789253388-582c481c54b0?auto=format&fit=crop&w=720&q=80'},
@@ -65,7 +67,7 @@ function renderProducts() {
 function openProduct(p) {
   p = { ...p, name: productNameOf(p), shop: sellerOf(p), dailyPrice: priceOf(p), image: imageOf(p) };
   selectedProduct = p;
-  $('#productDetail').innerHTML = `<img class="detail-image" src="${p.image}" alt="${p.name}"><div class="detail-content"><span class="shop-name">${p.shop} · ${p.area}</span><h2>${p.name}</h2><div class="detail-meta"><span>${baht(p.dailyPrice)} / วัน</span><span>มัดจำ ${baht(p.deposit)}</span></div><p>${p.description}</p><p><b>เงื่อนไข:</b> ตรวจสภาพสินค้าร่วมกับร้านก่อนรับคืน เงินมัดจำเป็นจำนวนตัวอย่างและตกลงกับร้านค้า</p><button class="btn btn-dark" id="goBooking">เลือกวันและส่งคำขอ →</button></div>`;
+  $('#productDetail').innerHTML = `<img class="detail-image" src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}"><div class="detail-content"><span class="shop-name">${escapeHTML(p.shop)} · ${escapeHTML(p.area)}</span><h2>${escapeHTML(p.name)}</h2><div class="detail-meta"><span>${baht(p.dailyPrice)} / วัน</span><span>มัดจำ ${baht(p.deposit)}</span></div><p>${escapeHTML(p.description)}</p><p><b>เงื่อนไข:</b> ตรวจสภาพสินค้าร่วมกับร้านก่อนรับคืน เงินมัดจำเป็นจำนวนตัวอย่างและตกลงกับร้านค้า</p><button class="btn btn-dark" id="goBooking">เลือกวันและส่งคำขอ →</button></div>`;
   $('#productDialog').showModal();
   $('#goBooking').onclick = () => { $('#productDialog').close(); openBooking(p); };
 }
@@ -74,7 +76,7 @@ function openBooking(p) {
   const today = new Date(); const iso = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
   const after = new Date(today); after.setDate(today.getDate()+4);
-  $('#bookingContent').innerHTML = `<div class="eyebrow">DEMO BOOKING</div><h2 style="font-family:Georgia;font-weight:400">ส่งคำขอจอง</h2><p class="shop-name">${p.name} · ${p.shop}</p><div class="booking-form"><label>วันรับสินค้า<input id="startDate" type="date" min="${iso(today)}" value="${iso(tomorrow)}"></label><label>วันคืนสินค้า<input id="endDate" type="date" min="${iso(today)}" value="${iso(after)}"></label><label class="check wide"><input id="protection" type="checkbox"> เพิ่ม Damage Protection (5% ของค่าเช่า)</label><div class="quote wide" id="priceQuote"></div><p class="disclaimer wide">DEMO ONLY · ยังไม่มีการตรวจสอบวันว่างหรือบันทึกการจองในฐานข้อมูล การชำระเงินจำลองไม่มีการตัดเงินจริง</p><button class="btn btn-dark wide" id="submitBooking">ดูสรุป Demo Checkout →</button></div>`;
+  $('#bookingContent').innerHTML = `<div class="eyebrow">DEMO BOOKING</div><h2 style="font-family:Georgia;font-weight:400">ส่งคำขอจอง</h2><p class="shop-name">${escapeHTML(p.name)} · ${escapeHTML(p.shop)}</p><div class="booking-form"><label>วันรับสินค้า<input id="startDate" type="date" min="${iso(today)}" value="${iso(tomorrow)}"></label><label>วันคืนสินค้า<input id="endDate" type="date" min="${iso(today)}" value="${iso(after)}"></label><label class="check wide"><input id="protection" type="checkbox"> เพิ่ม Damage Protection (5% ของค่าเช่า)</label><div class="quote wide" id="priceQuote"></div><p class="disclaimer wide">DEMO ONLY · ยังไม่มีการตรวจสอบวันว่างหรือบันทึกการจองในฐานข้อมูล การชำระเงินจำลองไม่มีการตัดเงินจริง</p><button class="btn btn-dark wide" id="submitBooking">ดูสรุป Demo Checkout →</button></div>`;
   $('#bookingDialog').showModal();
   const update = () => {
     try {
@@ -88,7 +90,7 @@ function openBooking(p) {
   $('#submitBooking').onclick = () => {
     const days = rentalDaysBetween($('#startDate').value, $('#endDate').value);
     const q = calculatePricing({dailyPrice:p.dailyPrice,rentalDays:days,deposit:p.deposit,protectionSelected:$('#protection').checked});
-    $('#bookingContent').innerHTML = `<div class="eyebrow">DEMO CHECKOUT</div><h2 style="font-family:Georgia;font-weight:400">สรุปยอดชำระ</h2><p>${p.name} · ${days} วัน</p><div class="quote">ค่าเช่า <b>${baht(q.rentalTotal/100)}</b><br>Protection <b>${baht(q.protectionFee/100)}</b><br>มัดจำ (คืนตามเงื่อนไขร้าน) <b>${baht(q.deposit/100)}</b><br>Commission 12% (หักจากผู้ให้เช่า) <b>${baht(q.platformFee/100)}</b><br>กองทุนชุมชน (รวมใน Commission) <b>${baht(q.communityFund/100)}</b><hr><strong>ยอดรวม (ไม่มีการตัดเงินจริง)</strong> <b>${baht(q.totalDue/100)}</b></div><p class="disclaimer">การจองยังไม่ถูกส่งหรือบันทึก ขณะนี้ Backend/Supabase ยังไม่ได้ตั้งค่า จึงไม่สามารถยืนยันวันว่างและสร้างรายการจองจริงได้</p><button class="btn btn-dark" data-close>รับทราบ</button>`;
+    $('#bookingContent').innerHTML = `<div class="eyebrow">DEMO CHECKOUT</div><h2 style="font-family:Georgia;font-weight:400">สรุปยอดชำระ</h2><p>${escapeHTML(p.name)} · ${days} วัน</p><div class="quote">ค่าเช่า <b>${baht(q.rentalTotal/100)}</b><br>Protection <b>${baht(q.protectionFee/100)}</b><br>มัดจำ (คืนตามเงื่อนไขร้าน) <b>${baht(q.deposit/100)}</b><br>Commission 12% (หักจากผู้ให้เช่า) <b>${baht(q.platformFee/100)}</b><br>กองทุนชุมชน (รวมใน Commission) <b>${baht(q.communityFund/100)}</b><hr><strong>ยอดรวม (ไม่มีการตัดเงินจริง)</strong> <b>${baht(q.totalDue/100)}</b></div><p class="disclaimer">การจองยังไม่ถูกส่งหรือบันทึก ขณะนี้ Backend/Supabase ยังไม่ได้ตั้งค่า จึงไม่สามารถยืนยันวันว่างและสร้างรายการจองจริงได้</p><button class="btn btn-dark" data-close>รับทราบ</button>`;
     $('#bookingContent [data-close]').onclick = () => $('#bookingDialog').close();
   };
 }
@@ -112,7 +114,7 @@ grid.addEventListener('click', e => {
 $('#searchInput').oninput = renderProducts; $('#searchBtn').onclick = renderProducts; $('#areaFilter').onchange = renderProducts; $('#sortFilter').onchange = renderProducts;
 document.querySelectorAll('[data-category]').forEach(b => b.onclick=()=>{selectedCategory=b.dataset.category;document.querySelectorAll('.filter-pill').forEach(x=>x.classList.toggle('active',x.dataset.category===selectedCategory));$('#catalog').scrollIntoView();renderProducts();});
 $('#showAllBtn').onclick = () => {selectedCategory='';$('#areaFilter').value='';$('#searchInput').value='';document.querySelectorAll('.filter-pill').forEach(x=>x.classList.toggle('active',!x.dataset.category));renderProducts();};
-$('#loginBtn').onclick = $('#joinBtn').onclick = () => $('#authDialog').showModal();
+initAuth();
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
 const menuButton = $('.menu-btn');
 menuButton.onclick = () => {
@@ -157,8 +159,41 @@ $('#matchBtn').onclick = () => {
   if(!query){$('#matcherStatus').textContent='กรุณาพิมพ์แผนทริปก่อน';return;}
   const cats=/ไทย|วัดอรุณ|เยาวราช/.test(query)?['thai_dress','camera']:['camping','camera'];
   const matches=products.filter(p=>cats.includes(p.category)).slice(0,3);
-  result.hidden=false; result.innerHTML=matches.map(p=>`<div class="match-item"><b>${p.name}</b><p>${p.description}</p><span>${baht(p.dailyPrice)} / วัน</span><br><button data-match="${p.id}" class="text-link" style="border:0;background:none;padding:8px 0">ดูสินค้า →</button></div>`).join('');
+  result.hidden=false; result.innerHTML=matches.map(p=>`<div class="match-item"><b>${escapeHTML(p.name)}</b><p>${escapeHTML(p.description)}</p><span>${baht(p.dailyPrice)} / วัน</span><br><button data-match="${escapeHTML(p.id)}" class="text-link" style="border:0;background:none;padding:8px 0">ดูสินค้า →</button></div>`).join('');
   $('#matcherStatus').textContent='DEMO FALLBACK · แนะนำจากสินค้าที่มีอยู่จริงในตัวอย่าง';
   result.querySelectorAll('[data-match]').forEach(b=>b.onclick=()=>{document.querySelector('#catalog').scrollIntoView();openProduct(products.find(p=>p.id===b.dataset.match));});
 };
 $('#avgRent').dispatchEvent(new Event('input'));renderProducts();initMagneticButtons();initFaqAnimations();
+
+async function loadOwnerListings() {
+  try {
+    const { data, error } = await getSupabase()
+      .from('products')
+      .select('id,name,category,area,daily_price,deposit,description,image_url,condition,shops(shop_name)')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    const listings = data.map(product => ({
+      id: product.id,
+      name: product.name,
+      category: product.category,
+      area: product.area,
+      dailyPrice: product.daily_price / 100,
+      deposit: product.deposit / 100,
+      shop: product.shops?.shop_name || 'ร้านค้าท้องถิ่น',
+      description: product.description,
+      image: product.image_url || products.find(sample => sample.category === product.category)?.image || products[0]?.image || '',
+    }));
+    const listingIds = new Set(listings.map(product => product.id));
+    products = [...products.filter(product => !listingIds.has(product.id)), ...listings];
+    renderProducts();
+  } catch (error) {
+    if (/ตั้งค่า Supabase/.test(error?.message || '')) return;
+    const notice = document.createElement('p');
+    notice.className = 'form-status';
+    notice.setAttribute('role', 'status');
+    notice.textContent = 'แสดงสินค้าตัวอย่างอยู่ชั่วคราว ไม่สามารถโหลดรายการจากร้านค้าได้';
+    grid.before(notice);
+  }
+}
+void loadOwnerListings();
