@@ -1,5 +1,6 @@
 import { calculatePricing, rentalDaysBetween, formatBaht } from './pricing.js';
 import { initMagneticButtons } from './magnetic-buttons.js';
+import { initFaqAnimations } from './faq.js';
 
 const products = [
   {id:'tent-2p',name:'เต็นท์แคมป์ปิ้ง 2 คน',category:'camping',area:'เขาใหญ่',dailyPrice:300,deposit:1000,shop:'บ้านป่าแคมป์',description:'เต็นท์กันฝนสำหรับ 2 คน พร้อมฟลายชีท เหมาะสำหรับทริปแคมป์ปิ้งช่วงสุดสัปดาห์',image:'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=720&q=80'},
@@ -118,4 +119,4 @@ $('#matchBtn').onclick = () => {
   $('#matcherStatus').textContent='DEMO FALLBACK · แนะนำจากสินค้าที่มีอยู่จริงในตัวอย่าง';
   result.querySelectorAll('[data-match]').forEach(b=>b.onclick=()=>{document.querySelector('#catalog').scrollIntoView();openProduct(products.find(p=>p.id===b.dataset.match));});
 };
-$('#avgRent').dispatchEvent(new Event('input'));renderProducts();initMagneticButtons();
+$('#avgRent').dispatchEvent(new Event('input'));renderProducts();initMagneticButtons();initFaqAnimations();
