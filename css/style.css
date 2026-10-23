@@ -1677,6 +1677,7 @@ button:disabled { cursor: not-allowed; opacity: .65; transform: none; }
   min-width: 0;
   min-height: 340px;
   aspect-ratio: .78;
+  container-type: inline-size;
   border: 0;
   border-radius: 23px;
   background: #182b3d;
@@ -1801,11 +1802,14 @@ button:disabled { cursor: not-allowed; opacity: .65; transform: none; }
 .product-grid .product-card .product-see-more-icon svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
 .product-grid .product-card :is(.save-btn, .product-see-more):focus-visible { outline: 3px solid #e6c36d; outline-offset: 3px; }
 @media (max-width: 420px) {
-  .product-grid .product-card { min-height: 285px; aspect-ratio: .7; }
-  .product-grid .product-card .product-info { padding: 18px 12px 12px; }
+  .product-grid .product-card { min-height: clamp(250px, 74vw, 285px); aspect-ratio: .71; }
+}
+@container (max-width: 220px) {
+  .product-grid .product-card .save-btn { top: 10px; right: 10px; width: 38px; height: 38px; }
+  .product-grid .product-card .product-info { padding: 16px 12px 12px; }
   .product-grid .product-card .product-info h3 { font-size: 13px; }
   .product-grid .product-card .shop-name { font-size: 10px; }
-  .product-grid .product-card .product-rating { gap: 4px; margin-top: 8px; font-size: 9px; }
+  .product-grid .product-card .product-rating { gap: 4px; min-height: 25px; margin-top: 8px; font-size: 9px; }
   .product-grid .product-card .product-bottom { gap: 9px; margin-top: 10px; }
   .product-grid .product-card .price { font-size: 18px; }
   .product-grid .product-card .product-see-more { min-height: 42px; font-size: 11px; }
