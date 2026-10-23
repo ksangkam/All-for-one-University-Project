@@ -85,6 +85,29 @@ $('.topbar nav').addEventListener('click', event => {
     menuButton.setAttribute('aria-label', 'เปิดเมนู');
   }
 });
+const navLinks = [...document.querySelectorAll('.topbar nav a[href^="#"]')];
+const navSections = navLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+function markCurrentSection() {
+  const marker = 112;
+  const current = navSections.find(section => {
+    const rect = section.getBoundingClientRect();
+    return rect.top <= marker && rect.bottom > marker;
+  }) || navSections.filter(section => section.getBoundingClientRect().top > marker)
+    .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)[0];
+  navLinks.forEach(link => {
+    const active = current && link.hash === `#${current.id}`;
+    link.classList.toggle('is-active', Boolean(active));
+    if (active) link.setAttribute('aria-current', 'location');
+    else link.removeAttribute('aria-current');
+  });
+}
+const sectionObserver = new IntersectionObserver(markCurrentSection, {
+  rootMargin: '-80px 0px -72% 0px',
+  threshold: 0,
+});
+navSections.forEach(section => sectionObserver.observe(section));
+window.addEventListener('resize', markCurrentSection, { passive: true });
+markCurrentSection();
 $('#avgRent').oninput = $('#orders').oninput = () => {const avg=Number($('#avgRent').value),orders=Number($('#orders').value);$('#avgValue').textContent=baht(avg);$('#ordersValue').textContent=orders;$('#monthlyRevenue').textContent=baht(Math.round(avg*orders*.12));};
 $('#matchBtn').onclick = () => {
   const query=$('#tripInput').value.trim(); const result=$('#matchResults');
