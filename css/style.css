@@ -2126,3 +2126,27 @@ html { scroll-padding-top: 94px; }
   .faq details, .faq summary::after { transition: none; }
   .faq .faq-item.faq-enter { animation: none; }
 }
+
+/* Keep product cards inside their grid tracks at every viewport width. */
+.product-grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  column-gap: clamp(14px, 2vw, 22px);
+  row-gap: 20px;
+  align-items: stretch;
+}
+.product-grid > .product-card {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 340px;
+  aspect-ratio: .78;
+}
+@media (max-width: 600px) {
+  .product-grid { row-gap: 18px; }
+  .product-grid > .product-card { min-height: 300px; aspect-ratio: 1; }
+}
+@media (max-width: 230px) {
+  .product-grid > .product-card { min-height: 270px; aspect-ratio: .78; }
+}
