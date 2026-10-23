@@ -25,6 +25,17 @@ Copy `.env.example` to `.env.local` when deploying/configuring. The Supabase ano
 
 Requires Node.js 18+: `node --test tests/pricing.test.js`. The JS pricing API accepts baht and converts to satang; SQL amounts are satang. Return date is exclusive. Commission is 12% of rent; community fund is 2% of commission and not additional renter revenue.
 
+## Magnetic button motion
+
+`js/magnetic-buttons.js` adds spring-based cursor follow and click bounce to every `<button>` and `.btn` link except `.menu-btn`. It also observes newly rendered buttons, such as product cards and modal actions. The cursor pull is capped at 7px; touch uses click bounce only. Users who prefer reduced motion do not receive either animation.
+
+Tune the constants near the top of that module:
+
+- Raise `POSITION_STIFFNESS` for a quicker, firmer cursor pull; lower it for a softer pull.
+- Raise `POSITION_DAMPING` to stop wobble sooner; lower it for a more elastic follow.
+- Raise `SCALE_STIFFNESS` for a faster click rebound; lower it for a softer bounce.
+- Raise `SCALE_DAMPING` to reduce bounce oscillation; lower it to make the rebound springier.
+
 ## Two-minute demo
 
 1. Explain local rental and community benefit.
